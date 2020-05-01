@@ -150,6 +150,10 @@ var cmdCONTROL = function (cmd, arg) {
     var app  = activeApplication();
     var pres = activePresentation(app);
     var ss   = activeSlideshow(app);
+    if ( pres !== null ){
+        var slideCount= pres.Slides.Count;
+    }
+
 
     /*  sanity check contexts  */
     if (cmd !== "BOOT") {
@@ -160,7 +164,7 @@ var cmdCONTROL = function (cmd, arg) {
         if (pres === null)
             throw new Error("still no active presentation");
     }
-    if (cmd.match(/(STOP|PAUSE|RESUME|FIRST|LAST|GOTO|PREV|NEXT)$/)) {
+    if (cmd.match(/(STOP|PAUSE|RESUME|GOTO|PREV|NEXT)$/)) {
         if (ss === null)
             throw new Error("still no running slideshow");
     }
@@ -191,9 +195,17 @@ var cmdCONTROL = function (cmd, arg) {
     else if (cmd === "RESUME")
         ss.View.GotoSlide(ss.View.CurrentShowPosition);
     else if (cmd === "FIRST")
-        ss.View.First();
+        if (ss===null) {
+            app.ActiveWindow.View.GotoSlide(1);
+        } else {
+            ss.View.First();
+        }
     else if (cmd === "LAST")
-        ss.View.Last();
+        if (ss===null) {
+            app.ActiveWindow.View.GotoSlide(slideCount);
+        } else {
+            ss.View.Last();
+        }
     else if (cmd === "GOTO")
         ss.View.GotoSlide(parseInt(arg, 10));
     else if (cmd === "PREV")
